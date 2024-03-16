@@ -52,6 +52,9 @@ class _MainScreenState extends State<MainScreen> {
             onEnterTapped: () {
               log("hide keyboard");
             },
+            onChanged: (value) {
+              log("value: $value");
+            },
             height: 260,
             backgroundColor: Colors.black,
             actionKeyColor: Colors.blueGrey,
@@ -63,6 +66,9 @@ class _MainScreenState extends State<MainScreen> {
             controller: _controller,
             onEnterTapped: () {
               log("hide keyboard");
+            },
+            onChanged: (value) {
+              log("value: $value");
             },
             backgroundColor: Colors.black,
             actionKeyColor: Colors.blueGrey,

@@ -16,6 +16,7 @@ class NumericKeyboard extends StatefulWidget {
     this.keyBorderRadius = 10,
     this.actionKeyIconColor = Colors.white,
     this.onEnterTapped,
+    this.onChanged,
     super.key,
   });
 
@@ -52,6 +53,9 @@ class NumericKeyboard extends StatefulWidget {
   /// Callback Function for Enter Key
   final Function()? onEnterTapped;
 
+  /// Callback when text is changed
+  final Function(String)? onChanged;
+
   @override
   State<NumericKeyboard> createState() => _NumericKeyboardState();
 }
@@ -79,6 +83,9 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
     return InkWell(
       onTap: () {
         widget.controller.text += kKey;
+        if (widget.onChanged != null) {
+          widget.onChanged!(widget.controller.text);
+        }
       },
       borderRadius: BorderRadius.circular(widget.keyBorderRadius),
       child: Container(
@@ -131,8 +138,24 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
       onTap: () {
         if (kKey == SpecialKey.backspace) {
           if (widget.controller.text.isNotEmpty) {
-            widget.controller.text = widget.controller.text
-                .substring(0, widget.controller.text.length - 1);
+            final selection = widget.controller.selection;
+            final text = widget.controller.text;
+            if (!selection.isValid || selection.baseOffset == 0) {
+              // If there's no valid selection, or the caret is at the beginning,
+              // there's nothing to remove, so just return.
+              return;
+            }
+            final newCaretPosition = selection.baseOffset - 1; // Move caret back by one.
+            // Create the new text by removing the character before the caret.
+            final newText = text.substring(0, newCaretPosition) + text.substring(selection.baseOffset);
+
+            // Update the text and set the new caret position.
+            widget.controller.text = newText;
+            widget.controller.selection = TextSelection.collapsed(offset: newCaretPosition);
+
+            if (widget.onChanged != null) {
+              widget.onChanged!(widget.controller.text);
+            }
           }
         } else if (kKey == SpecialKey.enter) {
           if (widget.onEnterTapped != null) {
