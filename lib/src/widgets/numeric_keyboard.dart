@@ -82,7 +82,20 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
   Widget numberKey(String kKey) {
     return InkWell(
       onTap: () {
-        widget.controller.text += kKey;
+        final selection = widget.controller.selection;
+        final text = widget.controller.text;
+
+        if (selection.isValid) {
+          final newText = text.substring(0, selection.baseOffset) + kKey + text.substring(selection.baseOffset);
+          widget.controller.text = newText;
+          widget.controller.selection = selection.copyWith(
+            baseOffset: selection.baseOffset + kKey.length,
+            extentOffset: selection.baseOffset + kKey.length,
+          );
+        } else {
+          widget.controller.text += kKey;
+        }
+
         if (widget.onChanged != null) {
           widget.onChanged!(widget.controller.text);
         }

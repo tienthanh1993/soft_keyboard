@@ -120,7 +120,20 @@ class _AlphanumericKeyboardState extends State<AlphanumericKeyboard> {
   Widget numberKey(String kKey) {
     return InkWell(
       onTap: () {
-        widget.controller.text += kKey;
+        final selection = widget.controller.selection;
+        final text = widget.controller.text;
+
+        if (selection.isValid) {
+          final newText = text.substring(0, selection.baseOffset) + kKey + text.substring(selection.baseOffset);
+          widget.controller.text = newText;
+          widget.controller.selection = selection.copyWith(
+            baseOffset: selection.baseOffset + kKey.length,
+            extentOffset: selection.baseOffset + kKey.length,
+          );
+        } else {
+          widget.controller.text += kKey;
+        }
+
         if (widget.onChanged != null) {
           widget.onChanged!(widget.controller.text);
         }
@@ -155,9 +168,24 @@ class _AlphanumericKeyboardState extends State<AlphanumericKeyboard> {
   Widget alphabetKey(String kKey) {
     return InkWell(
       onTap: () {
-        widget.controller.text += capitalization == Capitalization.lowerCase
+        final fKey = capitalization == Capitalization.lowerCase
             ? kKey.toLowerCase()
             : kKey;
+
+        final selection = widget.controller.selection;
+        final text = widget.controller.text;
+
+        if (selection.isValid) {
+          final newText = text.substring(0, selection.baseOffset) + fKey + text.substring(selection.baseOffset);
+          widget.controller.text = newText;
+          widget.controller.selection = selection.copyWith(
+            baseOffset: selection.baseOffset + kKey.length,
+            extentOffset: selection.baseOffset + kKey.length,
+          );
+        } else {
+          widget.controller.text += kKey;
+        }
+
         if (capitalization == Capitalization.onlyFirstLetter) {
           setState(() {
             capitalization = Capitalization.lowerCase;
